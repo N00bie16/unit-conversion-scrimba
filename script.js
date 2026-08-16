@@ -23,7 +23,7 @@ const convertUnit = (n) => {
 };
 
 btnConvert.addEventListener("click", function () {
-  const val = Number(inputNumber.value);
+  const val = inputNumber.value;
   convertUnit(val);
   containerResult.classList.remove("hidden");
 });

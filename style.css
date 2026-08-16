@@ -46,6 +46,12 @@ body {
   text-align: center;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .container-unit button {
   width: 117px;
   height: 42px;
