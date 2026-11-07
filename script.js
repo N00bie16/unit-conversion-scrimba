@@ -1,29 +1,69 @@
 const inputNumber = document.getElementById("input-number");
-const btnConvert = document.getElementById("btn-convert");
-
 const lengthValue = document.querySelector(".length");
 const volumeValue = document.querySelector(".volume");
 const massValue = document.querySelector(".mass");
-
 const containerResult = document.querySelector(".container-result");
+const conversionForm = document.querySelector(".conversion-form");
+const statusMessage = document.querySelector(".status-message");
 
-const convertUnit = (n) => {
-  const meterToFeet = (n * 3.28084).toFixed(3);
-  const feetToMeter = (n * 0.3048).toFixed(3);
+const conversionFactors = Object.freeze({
+  meterToFeet: 3.28084,
+  feetToMeter: 0.3048,
+  litersToGallons: 0.264172,
+  gallonsToLiters: 3.78541,
+  kilosToPounds: 2.20462,
+  poundsToKilos: 0.453592
+});
 
-  const litersToGallons = (n * 0.264172).toFixed(3);
-  const gallonsToLiters = (n * 3.78541).toFixed(3);
+const formatNumber = (value) =>
+  new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 3,
+    useGrouping: false
+  }).format(value);
 
-  const kilosToPounds = (n * 2.20462).toFixed(3);
-  const poundsToKilos = (n * 0.453592).toFixed(3);
+const convertUnit = (number) => {
+  const convertedValues = {
+    meterToFeet: number * conversionFactors.meterToFeet,
+    feetToMeter: number * conversionFactors.feetToMeter,
+    litersToGallons: number * conversionFactors.litersToGallons,
+    gallonsToLiters: number * conversionFactors.gallonsToLiters,
+    kilosToPounds: number * conversionFactors.kilosToPounds,
+    poundsToKilos: number * conversionFactors.poundsToKilos
+  };
 
-  lengthValue.textContent = `${n} meters = ${meterToFeet} feet | ${n} feet = ${feetToMeter} meters`;
-  volumeValue.textContent = `${n} liters = ${litersToGallons} gallons | ${n} gallons = ${gallonsToLiters} liters`;
-  massValue.textContent = `${n} kilos = ${kilosToPounds} pounds | ${n} pounds = ${poundsToKilos} kilos`;
+  if (Object.values(convertedValues).some((value) => !Number.isFinite(value))) {
+    throw new RangeError("The converted values are outside the supported range.");
+  }
+
+  const formattedInput = formatNumber(number);
+  lengthValue.textContent = `${formattedInput} meters = ${formatNumber(convertedValues.meterToFeet)} feet | ${formattedInput} feet = ${formatNumber(convertedValues.feetToMeter)} meters`;
+  volumeValue.textContent = `${formattedInput} liters = ${formatNumber(convertedValues.litersToGallons)} gallons | ${formattedInput} gallons = ${formatNumber(convertedValues.gallonsToLiters)} liters`;
+  massValue.textContent = `${formattedInput} kilos = ${formatNumber(convertedValues.kilosToPounds)} pounds | ${formattedInput} pounds = ${formatNumber(convertedValues.poundsToKilos)} kilos`;
 };
 
-btnConvert.addEventListener("click", function () {
-  const val = inputNumber.value;
-  convertUnit(val);
-  containerResult.classList.remove("hidden");
+conversionForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const value = inputNumber.value.trim();
+  const number = Number(value);
+
+  if (value === "" || !Number.isFinite(number)) {
+    statusMessage.textContent = "Enter a valid number.";
+    inputNumber.setAttribute("aria-invalid", "true");
+    containerResult.classList.add("hidden");
+    inputNumber.focus();
+    return;
+  }
+
+  try {
+    convertUnit(number);
+    statusMessage.textContent = "";
+    inputNumber.setAttribute("aria-invalid", "false");
+    containerResult.classList.remove("hidden");
+  } catch (error) {
+    statusMessage.textContent = "Enter a smaller number.";
+    inputNumber.setAttribute("aria-invalid", "true");
+    containerResult.classList.add("hidden");
+    inputNumber.focus();
+  }
 });

@@ -10,10 +10,21 @@
     <main id="main">
       <div class="container-unit">
         <h1>Metric/Imperial Unit Conversion</h1>
-        <input type="number" id="input-number" />
-        <button id="btn-convert">Convert</button>
+        <form class="conversion-form">
+          <label for="input-number">Value to convert</label>
+          <input
+            type="number"
+            id="input-number"
+            inputmode="decimal"
+            step="any"
+            aria-describedby="status-message"
+            required
+          />
+          <button type="submit" id="btn-convert">Convert</button>
+        </form>
+        <p id="status-message" class="status-message" role="alert"></p>
       </div>
-      <div class="container-result hidden">
+      <div class="container-result hidden" aria-live="polite">
         <div class="box">
           <h3>Length (Meter/Feet)</h3>
           <p class="length"></p>
